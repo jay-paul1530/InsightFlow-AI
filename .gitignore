@@ -219,3 +219,9 @@ __marimo__/
 
 .venv
 .env
+datasets/
+datasets/*
+
+# CSV files
+*.csv
+*.csv.gz
