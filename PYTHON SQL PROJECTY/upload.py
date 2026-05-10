@@ -13,7 +13,7 @@ if not DATABASE_URL:
 
 engine = create_engine(DATABASE_URL)
 
-df = pd.read_excel("E-Commerce Orders.csv")
+df = pd.read_csv("E-Commerce Orders.csv", encoding="utf-8SSSSS")
 
 df.to_sql(
     "customers",
