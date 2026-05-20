@@ -221,6 +221,8 @@ __marimo__/
 .env
 datasets/
 datasets/*
+temp_data/
+temp_data/*
 
 # CSV files
 *.csv
