@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 import psycopg2
 import json
@@ -40,7 +41,12 @@ def run_sql_query(sql: str) -> dict:
         data = json.loads(json.dumps(data, default=str))
 
         # Save to a local file for the agent to upload to sandbox if needed
-        file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'query_results.json'))
+        if not os.path.exists("temp_data"):
+            os.mkdir("temp_data")
+        
+        file_name = f"query_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        file_path = os.path.join("temp_data", file_name)
+
         with open(file_path, 'w') as f:
             json.dump(data, f)
 
