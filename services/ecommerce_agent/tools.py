@@ -3,7 +3,7 @@ import os
 import psycopg2
 import json
 from agents import function_tool
-from env import DB_HOSTNAME, DB_NAME, DB_USER, DB_PASSWORD, DB_PORT
+from env import DATABASE_URL
 
 
 
@@ -19,13 +19,7 @@ def run_sql_query(sql: str) -> dict:
     print("SQL Query: ", sql)
     try:
         # connect to database
-        connection = psycopg2.connect(
-            host=DB_HOSTNAME,
-            database=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            port=DB_PORT
-        )
+        connection = psycopg2.connect(DATABASE_URL)
 
         cursor = connection.cursor()
 
