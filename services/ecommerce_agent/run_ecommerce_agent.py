@@ -17,8 +17,12 @@ async def run_ecommerce_agent(user_input: str):
         mcp_servers=[sandbox_mcp_obj],
         model=get_openai_model()
     )
-    print("Executing agent...")
-    result = await Runner.run(agent, user_input)
-    print("Execution complete")
-    return result.final_output
+    try:
+        print("Executing agent...")
+        result = await Runner.run(agent, user_input)
+        print("Execution complete")
+        return result.final_output
+    finally:
+        if sandbox_mcp_obj:
+            await sandbox_mcp_obj.cleanup()
 
