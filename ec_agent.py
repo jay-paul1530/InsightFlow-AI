@@ -1,56 +1,69 @@
 import asyncio
+
 from services.ecommerce_agent.run_ecommerce_agent import run_ecommerce_agent
 
+from services.weviate_manager.weaviate_utils import (
+    create_collection,
+    insert_data,
+    read_all_objects,
+    hybrid_search,
+    delete_collection
+)
 
-if __name__ == "__main__":
+
+        # write logic to fetch old messages from weaviate, hybrid search
+        # very_old_messages = ""
+
+        # last 5 msg appened in list
+        # last_5_messages = ""
+        
+        # inp = f"""
+        # VERY OLD MESSAGE:
+        # {very_old_messages}
+
+        # Past 5 messages:
+        # {last_5_messages}
+        
+        # Current Input: {user_input}
+        # """
+def chatbot():
+
+    create_collection("chat_history")
+
     while True:
-        # user_input = "Give me top 5 orders for unit price above 250, and create graph between unitprice and totalorder"
+
+        # user_input = "Give me top 5 orders for unit price above 250"
+
         user_input = input("User: ")
-        response = asyncio.run(run_ecommerce_agent(user_input))
+
+        response = asyncio.run(
+            run_ecommerce_agent(user_input=user_input)
+        )
+
         print("AI Response:", response)
-# import asyncio
-# from services.ecommerce_agent.run_ecommerce_agent import run_ecommerce_agent
+
+        # Store conversation in Weaviate
+        weaviate_input = f"""
+USER:
+{user_input}
+
+AI:
+{response}
+"""
+
+        insert_data(
+            "chat_history",
+            {
+                "conversation": weaviate_input
+            }
+        )
 
 
-# # def chatbot():
-#     while True:
-#      # user_input = "Give me top 5 orders for unit price above 250, and create graph between unitprice and totalorder"
-#         user_input = input("User: ")
+#if __name__ == "__main__":
+#    chatbot()
 
-#         # write logic to fetch old messages from weaviate, hybrid search
-#         # very_old_messages = ""
+#print(read_all_objects("chat_history"))
 
-#         # last 5 msg appened in list
-#         # last_5_messages = ""
-        
-#         # inp = f"""
-#         # VERY OLD MESSAGE:
-#         # {very_old_messages}
+#print(hybrid_search("chat_history", "What are the top 5 orders for unit price above 250?", limit=5))
 
-#         # Past 5 messages:
-#         # {last_5_messages}
-        
-#         # Current Input: {user_input}
-#         # """
-
-#         response = asyncio.run(run_ecommerce_agent(user_input=user_input))
-#         print("AI Response:", response)
-
-
-#         # after this response add user_input and ai_response in weaviate
-#         # weaviate_input = f"""
-#         # USER:
-#         # {user_input}
-
-#         # AI:
-#         # {response}
-#         # """
-#         # Store this in weavite
-#         # ...
-#         # ...
-
-
-
-# if __name__ == "__main__":
-#     chatbot()
-   
+#delete_collection("chat_memory")

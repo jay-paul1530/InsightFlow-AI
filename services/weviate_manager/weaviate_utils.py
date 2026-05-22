@@ -42,6 +42,21 @@ def insert_data(collection_name, data_objects: dict):
     else:
         print(f"Collection {collection_name} does not exist")
 
+def read_all_objects(collection_name):
+    with weaviate.connect_to_local() as client:
+        exists = client.collections.exists(collection_name)
+
+    if exists:
+        with weaviate.connect_to_local() as client:
+            coll = client.collections.use(collection_name)  
+            data = []
+            for item in coll.iterator(include_vector=False):
+                data.append({"uuid": item.uuid, "properties": item.properties, "vector": item.vector})
+            return data
+    else:
+        print(f"Collection {collection_name} does not exist")
+        return None
+    
 # def insert_batch_data(collection_name, data_objects: list, batch_size=5):
 #     with weaviate.connect_to_local() as client:
 #         exists = client.collections.exists(collection_name)
