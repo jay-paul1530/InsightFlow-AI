@@ -15,3 +15,4 @@ def etl_run():
     # Load
     status = data_loader(df_transformed, database_url=DATABASE_URL, table_name=TABLE_NAME)
     print("Data loaded successfully:", status)
+    
