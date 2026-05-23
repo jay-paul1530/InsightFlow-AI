@@ -1,10 +1,6 @@
 import ollama
 from env import EMBEDDING_MODEL_NAME
 
-
-
-
-
 def get_embedding_ollama(text: str):
     print(f"Embedding text: {text}")
 

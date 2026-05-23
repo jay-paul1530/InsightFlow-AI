@@ -44,12 +44,13 @@ def chatbot():
 
         # Store conversation in Weaviate
         weaviate_input = f"""
-USER:
-{user_input}
+        
+        USER:
+        {user_input}
 
-AI:
-{response}
-"""
+        AI:
+        {response}
+        """
 
         insert_data(
             "chat_history",
@@ -59,8 +60,8 @@ AI:
         )
 
 
-#if __name__ == "__main__":
-#    chatbot()
+if __name__ == "__main__":
+   chatbot()
 
 #print(read_all_objects("chat_history"))
 
