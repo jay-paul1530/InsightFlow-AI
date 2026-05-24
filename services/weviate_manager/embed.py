@@ -1,19 +1,32 @@
-import ollama
-from env import EMBEDDING_MODEL_NAME
+import requests
+from env import EMBEDDING_MODEL_NAME, JINA_API_KEY
 
-def get_embedding_ollama(text: str):
-    print(f"Embedding text: {text}")
 
-    client = ollama.Client(host="http://localhost:11435")
+def get_embedding_jina(text: str):
+    url = "https://api.jina.ai/v1/embeddings"
 
-    response = client.embed(
-        model=EMBEDDING_MODEL_NAME,
-        input=text,
+    headers = {
+        "Authorization": f"Bearer {JINA_API_KEY}",
+        "Content-Type": "application/json",
+    }
+
+    payload = {
+        "model": EMBEDDING_MODEL_NAME,
+        "input": [text],
+    }
+
+    response = requests.post(
+        url,
+        headers=headers,
+        json=payload
     )
 
-    embeddings = response.get('embeddings', [])
+    # helpful debugging if Jina rejects request
+    if response.status_code != 200:
+        print("Jina error:", response.status_code)
+        print(response.text)
+        response.raise_for_status()
 
-    if embeddings and isinstance(embeddings[0], list):
-        return embeddings[0]
+    result = response.json()
 
-    return embeddings
+    return result["data"][0]["embedding"]

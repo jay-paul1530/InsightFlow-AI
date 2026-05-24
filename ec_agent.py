@@ -5,66 +5,107 @@ from services.ecommerce_agent.run_ecommerce_agent import run_ecommerce_agent
 from services.weviate_manager.weaviate_utils import (
     create_collection,
     insert_data,
-    read_all_objects,
-    hybrid_search,
-    delete_collection
+    hybrid_search
 )
 
 
-        # write logic to fetch old messages from weaviate, hybrid search
-        # very_old_messages = ""
-
-        # last 5 msg appened in list
-        # last_5_messages = ""
-        
-        # inp = f"""
-        # VERY OLD MESSAGE:
-        # {very_old_messages}
-
-        # Past 5 messages:
-        # {last_5_messages}
-        
-        # Current Input: {user_input}
-        # """
 def chatbot():
 
-    create_collection("chat_history")
+    create_collection("products_2")
+
+    # last 5
+    chat_history = []
 
     while True:
 
-        # user_input = "Give me top 5 orders for unit price above 250"
-
         user_input = input("User: ")
 
+        # ---------------------------
+        # RAG search from Weaviate
+        # ---------------------------
+        old_results = hybrid_search(
+            "products_2",
+            user_input,
+            limit=5
+        )
+
+        very_old_messages = ""
+
+        if old_results:
+            print(f"[RAG] Found {len(old_results)} relevant older messages from Weaviate")
+
+            for item in old_results:
+                very_old_messages += (
+                    item["properties"]["conversation"] + "\n"
+                )
+        else:
+            print("[RAG] No relevant older messages found")
+
+        # ---------------------------
+        # Recent memory from list
+        # ---------------------------
+        last_5_messages = ""
+
+        if chat_history:
+            print(f"[Recent Memory] Using last {len(chat_history)} messages from in-memory list")
+
+            for msg in chat_history:
+                last_5_messages += msg + "\n"
+        else:
+            print("[Recent Memory] No recent messages in memory")
+
+        # ---------------------------
+        # Final prompt
+        # ---------------------------
+        inp = f"""
+VERY OLD MESSAGE:
+{very_old_messages}
+
+Past 5 messages:
+{last_5_messages}
+
+Current Input:
+{user_input}
+"""
+
+        print("[Agent] Sending prompt with recent + RAG context")
+
+        # run agent
         response = asyncio.run(
-            run_ecommerce_agent(user_input=user_input)
+            run_ecommerce_agent(user_input=inp)
         )
 
         print("AI Response:", response)
 
-        # Store conversation in Weaviate
-        weaviate_input = f"""
-        
-        USER:
-        {user_input}
+        # ---------------------------
+        # Store current exchange
+        # ---------------------------
+        current_chat = f"""
+USER:
+{user_input}
 
-        AI:
-        {response}
-        """
+AI:
+{response}
+"""
 
+        # append to recent memory
+        chat_history.append(current_chat)
+
+        # keep only last 5
+        if len(chat_history) > 5:
+            removed = chat_history.pop(0)
+            print("[Recent Memory] Removed oldest message to keep only last 5")
+
+        # store in Weaviate
         insert_data(
-            "chat_history",
+            "products_2",
             {
-                "conversation": weaviate_input
+                "conversation": current_chat
             }
         )
 
+        print("[Weaviate] Stored current conversation\n")
+
 
 if __name__ == "__main__":
-   chatbot()
-
-#print(read_all_objects("chat_history"))
-
-#print(hybrid_search("chat_history", "What are the top 5 orders for unit price above 250?", limit=5))
-
-#delete_collection("chat_memory")
+    chatbot()

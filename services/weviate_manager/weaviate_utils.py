@@ -1,25 +1,34 @@
 import weaviate
-from weaviate.classes.config import Configure
+from weaviate.classes.config import DataType, Property, Configure
 from weaviate.classes.query import MetadataQuery
 from weaviate.classes.query import HybridFusion
+from services.weviate_manager.embed import get_embedding_jina
 
+
+import weaviate
 
 def create_collection(collection_name):
-    # Step 1.1: Connect to your local Weaviate instance
     with weaviate.connect_to_local() as client:
         print(f"Checking if collection {collection_name} exists")
+
         exists = client.collections.exists(collection_name)
         print(f"Collection {collection_name} exists: {exists}")
+
         if not exists:
             print(f"Creating collection {collection_name}")
-            # Step 1.2: Create a collection
+
             client.collections.create(
                 name=collection_name,
-                vector_config=Configure.Vectors.text2vec_ollama(  # Configure the Ollama embedding integration
-                api_endpoint="http://ollama:11434", # If using Docker you might need: http://host.docker.internal:11434
-                model="nomic-embed-text",  # The model to use
-            ))
+                properties=[
+                    Property(
+                        name="text",
+                        data_type=DataType.TEXT
+                    )
+                ]
+            )
+
             print("Collection created successfully")
+
         else:
             print(f"Collection {collection_name} already exists")
 
@@ -71,29 +80,53 @@ def read_all_objects(collection_name):
 #     else:
 #         print(f"Collection {collection_name} does not exist")
 
-
-def hybrid_search(collection_name, query, limit =5):
+def get_recent_messages(collection_name, limit=5):
     with weaviate.connect_to_local() as client:
         exists = client.collections.exists(collection_name)
 
-    if exists:
-        with weaviate.connect_to_local() as client:
+        if exists:
             coll = client.collections.use(collection_name)
-            response = coll.query.hybrid(
-                query=query,
-                limit=limit,
-                alpha=0.3,
-                fusion_type=HybridFusion.RELATIVE_SCORE,
-                return_metadata=MetadataQuery(score=True, explain_score=True),
-            )
+
             data = []
-            for obj in response.objects:
-                data.append({"properties": obj.properties, 
-                            "uuid": obj.uuid,
-                            "vector": obj.vector.get("default") if isinstance(obj.vector, dict) else obj.vector,
-                            }
-                            )
-            return data
-    else:
-        print(f"Collection {collection_name} does not exist")
-        return None
+
+            for item in coll.iterator(include_vector=False):
+                data.append(item.properties)
+
+            return data[-limit:]
+
+        return []
+
+
+def hybrid_search(collection_name, query, limit=5):
+    with weaviate.connect_to_local() as client:
+
+        if not client.collections.exists(collection_name):
+            print(f"Collection {collection_name} does not exist")
+            return None
+
+        coll = client.collections.use(collection_name)
+
+        response = coll.query.hybrid(
+            query=query,
+            vector=get_embedding_jina(query),
+            limit=limit,
+            alpha=0.3,
+            fusion_type=HybridFusion.RELATIVE_SCORE,
+            return_metadata=MetadataQuery(
+                score=True,
+                explain_score=True
+            ),
+        )
+
+        return [
+            {
+                "properties": obj.properties,
+                "uuid": obj.uuid,
+                "vector": (
+                    obj.vector.get("default")
+                    if isinstance(obj.vector, dict)
+                    else obj.vector
+                ),
+            }
+            for obj in response.objects
+        ]
