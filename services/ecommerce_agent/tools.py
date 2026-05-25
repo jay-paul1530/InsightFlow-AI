@@ -3,7 +3,11 @@ import os
 import psycopg2
 import json
 from agents import function_tool
-from env import DB_HOSTNAME, DB_NAME, DB_USER, DB_PASSWORD, DB_PORT
+from env import DATABASE_URL
+from rich.console import Console
+from rich.panel import Panel
+
+console = Console()
 
 
 
@@ -15,17 +19,11 @@ def run_sql_query(sql: str) -> dict:
     Args:
         sql (str): The SQL query string to execute.
     """
-    print("Executing `run_sql_query` tool...")
-    print("SQL Query: ", sql)
+    console.print("\n[bold magenta]Executing `run_sql_query` tool...[/bold magenta]")
+    console.print(Panel(sql, title="SQL Query", border_style="magenta", expand=False))
     try:
         # connect to database
-        connection = psycopg2.connect(
-            host=DB_HOSTNAME,
-            database=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            port=DB_PORT
-        )
+        connection = psycopg2.connect(DATABASE_URL)
 
         cursor = connection.cursor()
 
@@ -54,7 +52,7 @@ def run_sql_query(sql: str) -> dict:
         cursor.close()
         connection.close()
 
-        print(f"Data fetched successfully. Saved to {file_path}")
+        console.print(f"[bold green]Data fetched successfully. Saved to {file_path}[/bold green]")
         return {
                 "status": "success",
                 "message": f"Query returned {len(data)} rows. Data has been saved to the file path below. Please use the upload_file_to_sandbox tool to upload this file to the sandbox for further processing.",
@@ -63,8 +61,8 @@ def run_sql_query(sql: str) -> dict:
                 "saved_file_path": file_path
             }
     except Exception as e:
-        print("\n ERROR OCCURED IN SQL QUERY EXECUTION \n")
-        print(f"Error: {e}\n")
+        console.print("\n[bold red]ERROR OCCURRED IN SQL QUERY EXECUTION[/bold red]")
+        console.print(f"[red]Error: {e}[/red]\n")
         return {
                 "status": "failed",
                 "message": f"\n ERROR OCCURED IN SQL QUERY EXECUTION \n Error: {e}\n",

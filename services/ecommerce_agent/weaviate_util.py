@@ -1,29 +1,26 @@
-import weaviate
-from weaviate.classes.config import Configure
-import os
 import json
-import sys
-from pathlib import Path
+import weaviate
 from weaviate.classes.data import DataObject
-sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
-
+from weaviate.classes.query import Filter
 from services.ecommerce_agent.embed import get_embedding_jina
+from rich.console import Console
+
+console = Console()
+
 
 def create_collection(collection_name: str):
-    
     with weaviate.connect_to_local() as client:
         exists = client.collections.exists(collection_name)
-        # print(exists)
         if not exists:
-            print(f"Collection named {collection_name} does not exists")
-            
+            console.print(f"[dim]Collection named {collection_name} does not exist. Creating...[/dim]")
+
             # create collection
             client.collections.create(
                 name=collection_name,
             )
-            print(f"Collection named {collection_name} created successfully")
+            console.print(f"[bold green]Collection named {collection_name} created successfully[/bold green]")
         else:
-            print(f"Collection named {collection_name} already exists") 
+            console.print(f"[dim]Collection named {collection_name} already exists[/dim]") 
 
 
 def insert_data(collection_name, data_objects):
@@ -40,10 +37,10 @@ def insert_data(collection_name, data_objects):
                 items.append(DataObject(properties=obj, vector=vec))
             
             response = collection.data.insert_many(items)
-            print(f"inserted data in {collection_name} with uuids: {response.uuids}")
+            console.print(f"[dim]Inserted data in {collection_name} with uuids: {response.uuids}[/dim]")
         
         else:
-            print(f"Collection {collection_name} does not exist")
+            console.print(f"[yellow]Collection {collection_name} does not exist[/yellow]")
 
 
 def read_all_objects(collection_name):
@@ -58,7 +55,7 @@ def read_all_objects(collection_name):
                 data.append({"uuid": item.uuid, "properties": item.properties, "vector": item.vector})
             return data
     else:
-        print(f"Collection {collection_name} does not exist")
+        console.print(f"[yellow]Collection {collection_name} does not exist[/yellow]")
         return None
 
 def delete_object(collection_name):
@@ -68,17 +65,20 @@ def delete_object(collection_name):
     if exists:
         with weaviate.connect_to_local() as client:
             client.collections.delete(collection_name)
-            print(f"Collection {collection_name} deleted")
+            console.print(f"[dim]Collection {collection_name} deleted[/dim]")
     else:
-        print(f"Collection {collection_name} does not exist")
+        console.print(f"[yellow]Collection {collection_name} does not exist[/yellow]")
 
-def search_data(collection_name, query_text, limit=3):
+
+def search_data(collection_name, query_text, session_id=None, limit=3):
     with weaviate.connect_to_local() as client:
         if client.collections.exists(collection_name):
             collection = client.collections.use(collection_name)
             try:
+                filters = Filter.by_property("session_id").equal(session_id) if session_id else None
                 response = collection.query.bm25(
                     query=query_text,
+                    filters=filters,
                     limit=limit
                 )
                 data = []
@@ -86,23 +86,8 @@ def search_data(collection_name, query_text, limit=3):
                     data.append(item.properties)
                 return data
             except weaviate.exceptions.WeaviateQueryError as e:
-                print(f"Search skipped (collection is likely empty or unindexed): {e}")
+                console.print(f"[yellow]Weaviate search skipped (collection is likely empty or unindexed).[/yellow]")
                 return []
         else:
-            print(f"Collection {collection_name} does not exist")
+            console.print(f"[yellow]Collection {collection_name} does not exist[/yellow]")
             return []
-
-
-
-
-# collection_name = "Ecommerce_ChatHistory"
-
-# create_collection(collection_name)   
-# print(read_collection_schema(collection_name))
-
-
-# insert_data(collection_name, data_objects)
-
-# print(read_all_objects(collection_name))
-
-# delete_object(collection_name)

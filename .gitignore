@@ -227,3 +227,5 @@ temp_data/*
 # CSV files
 *.csv
 *.csv.gz
+*.pyc
+*.pyc/*
