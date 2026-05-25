@@ -10,19 +10,19 @@ set_tracing_disabled(True)
 
 async def run_ecommerce_agent(user_input: str):
     sandbox_mcp_obj = await sandbox_mcp()
+    agent = Agent(
+        name="EcommerceAgent",
+        instructions=SQL_AGENT_PROMPT,
+        tools=[run_sql_query],
+        mcp_servers=[sandbox_mcp_obj],
+        model=get_openai_model()
+    )
     try:
-        agent = Agent(
-            name="EcommerceAgent",
-            instructions=SQL_AGENT_PROMPT,
-            tools=[run_sql_query],
-            mcp_servers=[sandbox_mcp_obj],
-            model=get_openai_model()
-        )
         print("Executing agent...")
         result = await Runner.run(agent, user_input)
         print("Execution complete")
         return result.final_output
     finally:
-        print("Cleaning up Sandbox MCP...")
-        await sandbox_mcp_obj.cleanup()
+        if sandbox_mcp_obj:
+            await sandbox_mcp_obj.cleanup()
 
