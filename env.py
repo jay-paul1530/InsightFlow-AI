@@ -14,14 +14,9 @@ OPENROUTER_URL = os.getenv("OPENROUTER_URL")
 
 MCP_SANDBOX_URL = os.getenv("MCP_SANDBOX_URL")
 
-DB_HOSTNAME = os.getenv("Hostname")
-DB_PORT = os.getenv("DB_Port")
-DB_NAME = os.getenv("DB_Name")
-DB_USER = os.getenv("DB_User")
-DB_PASSWORD = os.getenv("DB_Password")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOSTNAME}:{DB_PORT}/{DB_NAME}" if (os.getenv("DATABASE_URL") == "" or os.getenv("DATABASE_URL") is None) else os.getenv("DATABASE_URL")
-
-
+JINA_API_KEY = os.getenv("JINA_API_KEY")
 EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME")
 
+LEN_CHAT_HISTORY = int(os.getenv("LEN_CHAT_HISTORY"))
