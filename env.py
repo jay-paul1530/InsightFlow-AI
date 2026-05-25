@@ -5,7 +5,7 @@ load_dotenv()
 
 DATASET_DIR = os.getenv("DATASET_DIR")
 FILE_NAME = os.getenv("FILE_NAME")
-VALUE_OF_INR = float(os.getenv("VALUE_OF_INR"))
+VALUE_OF_INR = float(os.getenv("INR_RATE", 1.0))
 TABLE_NAME = os.getenv("TABLE_NAME")
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")

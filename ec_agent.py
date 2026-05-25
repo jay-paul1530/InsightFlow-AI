@@ -1,6 +1,7 @@
 import asyncio
 from env import LEN_CHAT_HISTORY
 from services.ecommerce_agent.run_ecommerce_agent import run_ecommerce_agent
+import services.ecommerce_agent.weaviate_util as weaviate_util
 
 from services.weviate_manager.weaviate_utils import (
     create_collection,
@@ -101,6 +102,7 @@ AI:
 
     return response, chat_history
 
+    return response, messages       
 
 if __name__ == "__main__":
     

@@ -1,0 +1,10 @@
+pandas==3.0.2
+numpy==2.4.4
+supabase==2.30.0
+pydantic==2.13.4
+postgrest==2.30.0
+python-dotenv==1.0.1
+dotenv==0.9.9
+openai-agents==0.17.2
+litellm==1.84.0
+weaviate-client==4.21.0
