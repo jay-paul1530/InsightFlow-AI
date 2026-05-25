@@ -1,5 +1,5 @@
 import asyncio
-
+from env import LEN_CHAT_HISTORY
 from services.ecommerce_agent.run_ecommerce_agent import run_ecommerce_agent
 
 from services.weviate_manager.weaviate_utils import (
@@ -9,78 +9,73 @@ from services.weviate_manager.weaviate_utils import (
 )
 
 
-def chatbot():
+def chatbot(user_input, chat_history=None, collection_name="user_chat_history"):
 
-    create_collection("products_2")
+    create_collection(collection_name)
 
-    # last 5
-    chat_history = []
+    if chat_history is None:
+        chat_history = []
 
-    while True:
+    # ---------------------------
+    # RAG search from Weaviate
+    # ---------------------------
+    old_results = hybrid_search(
+        collection_name,
+        user_input,
+        limit=LEN_CHAT_HISTORY
+    )
 
-        user_input = input("User: ")
+    very_old_messages = ""
 
-        # ---------------------------
-        # RAG search from Weaviate
-        # ---------------------------
-        old_results = hybrid_search(
-            "products_2",
-            user_input,
-            limit=5
-        )
+    if old_results:
+        print(f"[RAG] Found {len(old_results)} relevant older messages from Weaviate")
 
-        very_old_messages = ""
+        for item in old_results:
+            very_old_messages += (
+                item["properties"]["conversation"] + "\n"
+            )
+    else:
+        print("[RAG] No relevant older messages found")
 
-        if old_results:
-            print(f"[RAG] Found {len(old_results)} relevant older messages from Weaviate")
+    # ---------------------------
+    # Recent memory from list
+    # ---------------------------
+    last_n_messages = ""
 
-            for item in old_results:
-                very_old_messages += (
-                    item["properties"]["conversation"] + "\n"
-                )
-        else:
-            print("[RAG] No relevant older messages found")
+    if chat_history:
+        print(f"[Recent Memory] Using last {len(chat_history)} messages from in-memory list")
 
-        # ---------------------------
-        # Recent memory from list
-        # ---------------------------
-        last_5_messages = ""
+        for msg in chat_history:
+            last_n_messages += msg + "\n"
+    else:
+        print("[Recent Memory] No recent messages in memory")
 
-        if chat_history:
-            print(f"[Recent Memory] Using last {len(chat_history)} messages from in-memory list")
-
-            for msg in chat_history:
-                last_5_messages += msg + "\n"
-        else:
-            print("[Recent Memory] No recent messages in memory")
-
-        # ---------------------------
-        # Final prompt
-        # ---------------------------
-        inp = f"""
+    # ---------------------------
+    # Final prompt
+    # ---------------------------
+    inp = f"""
 VERY OLD MESSAGE:
 {very_old_messages}
 
-Past 5 messages:
-{last_5_messages}
+Past {LEN_CHAT_HISTORY} messages:
+{last_n_messages}
 
 Current Input:
 {user_input}
 """
 
-        print("[Agent] Sending prompt with recent + RAG context")
+    print("[Agent] Sending prompt with recent + RAG context")
 
-        # run agent
-        response = asyncio.run(
-            run_ecommerce_agent(user_input=inp)
-        )
+    # run agent
+    response = asyncio.run(
+        run_ecommerce_agent(user_input=inp)
+    )
 
-        print("AI Response:", response)
 
-        # ---------------------------
-        # Store current exchange
-        # ---------------------------
-        current_chat = f"""
+    # ---------------------------
+    # Store current exchange
+    # ---------------------------
+    current_chat = f"""
 USER:
 {user_input}
 
@@ -88,24 +83,31 @@ AI:
 {response}
 """
 
-        # append to recent memory
-        chat_history.append(current_chat)
+    # append to recent memory
+    chat_history.append(current_chat)
 
-        # keep only last 5
-        if len(chat_history) > 5:
-            removed = chat_history.pop(0)
-            print("[Recent Memory] Removed oldest message to keep only last 5")
+    # keep only last n
+    if len(chat_history) > LEN_CHAT_HISTORY:
+        removed = chat_history.pop(0)
+        print(f"[Recent Memory] Removed oldest message to keep only last {LEN_CHAT_HISTORY}")
 
-        # store in Weaviate
-        insert_data(
-            "products_2",
-            {
-                "conversation": current_chat
-            }
-        )
+    # store in Weaviate
+    insert_data(
+        collection_name,
+        {
+            "conversation": current_chat
+        }
+    )
 
-        print("[Weaviate] Stored current conversation\n")
+    return response, chat_history
 
 
 if __name__ == "__main__":
-    chatbot()
+    
+    # last n
+    chat_history = []
+    
+    while True:
+        user_input = input("User: ")
+        response, chat_history = chatbot(user_input, chat_history=chat_history, collection_name="user_chat_history")
+        print("AI Response:", response)
