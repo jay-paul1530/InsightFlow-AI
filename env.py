@@ -22,3 +22,6 @@ DB_PASSWORD = os.getenv("DB_Password")
 
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOSTNAME}:{DB_PORT}/{DB_NAME}" if (os.getenv("DATABASE_URL") == "" or os.getenv("DATABASE_URL") is None) else os.getenv("DATABASE_URL")
 
+
+EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME")
+
