@@ -1,46 +1,46 @@
 import asyncio
 from services.ecommerce_agent.run_ecommerce_agent import run_ecommerce_agent
+import services.ecommerce_agent.weaviate_util as weaviate_util
 
 
-def chatbot():
-    while True:
-     # user_input = "Give me top 5 orders for unit price above 250, and create graph between unitprice and totalorder"
-        user_input = input("User: ")
+def chatbot(user_input, messages, collection_name="Ecommerce_ChatHistory"):
 
-        # write logic to fetch old messages from weaviate, hybrid search
-        # very_old_messages = ""
-
-        # last 5 msg appened in list
-        # last_5_messages = ""
+    if len(messages) >= 5:
+        popped_msg = messages.pop(0)
+        weaviate_util.insert_data(collection_name, [popped_msg])
         
-        # inp = f"""
-        # VERY OLD MESSAGE:
-        # {very_old_messages}
-
-        # Past 5 messages:
-        # {last_5_messages}
+    context_str = ""
+    
+    # Retrieve older relevant messages from Weaviate
+    old_context = weaviate_util.search_data(collection_name, user_input, limit=2)
+    if old_context:
+        context_str += "Relevant Older Context:\n"
+        for item in old_context:
+            user_msg = item.get("user", item.get("User", ""))
+            ai_msg = item.get("aI", item.get("AI", item.get("ai", "")))
+            context_str += f"User: {user_msg}\nAI: {ai_msg}\n"
+        context_str += "\n"
         
-        # Current Input: {user_input}
-        # """
+    if messages:
+        context_str += "Recent Conversation History:\n"
+        for msg in messages:
+            context_str += f"User: {msg['User']}\nAI: {msg['AI']}\n"
+        context_str += "\nCurrent Request: "
+        
+    full_input = context_str + user_input
+    
+    response = asyncio.run(run_ecommerce_agent(user_input=full_input))
+    messages.append({"User": user_input, "AI": response})
 
-        response = asyncio.run(run_ecommerce_agent(user_input=user_input))
-        print("AI Response:", response)
-
-
-        # after this response add user_input and ai_response in weaviate
-        # weaviate_input = f"""
-        # USER:
-        # {user_input}
-
-        # AI:
-        # {response}
-        # """
-        # Store this in weavite
-        # ...
-        # ...
-
-
+    return response, messages       
 
 if __name__ == "__main__":
-    chatbot()
-   
+    weaviate_util.create_collection("Ecommerce_ChatHistory")
+    messages = []
+    while True:
+        user_input = input("User: ")
+        if not user_input.strip():
+            continue
+        result, messages = chatbot(user_input, messages, collection_name="Ecommerce_ChatHistory")
+        print(f"AI: {result}")
+
