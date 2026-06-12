@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SQLChat | Text-to-SQL AI Assistant",
+  title: "QueryLens | Text-to-SQL AI Assistant",
   description: "A professional conversational interface for text-to-SQL ecommerce databases. Write questions and get instant SQL and data results.",
 };
 

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import HeroSection from "./HeroSection";
 
 interface Session {
   session_id: string;
@@ -40,6 +41,7 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [showHero, setShowHero] = useState(true);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -243,14 +245,23 @@ export default function Home() {
     }
   ];
 
+  if (showHero) {
+    return <HeroSection onGetStarted={() => setShowHero(false)} />;
+  }
+
   return (
     <div className="app-container">
       {/* Sidebar */}
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
         <div className="sidebar-header">
-          <div className="logo-section">
+          <div 
+            className="logo-section" 
+            onClick={() => setShowHero(true)} 
+            style={{ cursor: "pointer" }}
+            title="Go to Home"
+          >
             <Database className="logo-icon" size={20} />
-            <span>SQLChat Assistant</span>
+            <span>QueryLens</span>
           </div>
           {sidebarOpen && (
             <button className="menu-toggle" onClick={() => setSidebarOpen(false)}>
@@ -306,9 +317,14 @@ export default function Home() {
           <button className="menu-toggle" onClick={() => setSidebarOpen(true)}>
             <Menu size={20} />
           </button>
-          <div className="logo-section">
+          <div 
+            className="logo-section" 
+            onClick={() => setShowHero(true)} 
+            style={{ cursor: "pointer" }}
+            title="Go to Home"
+          >
             <Database className="logo-icon" size={18} />
-            <span>SQLChat</span>
+            <span>QueryLens</span>
           </div>
         </header>
 
