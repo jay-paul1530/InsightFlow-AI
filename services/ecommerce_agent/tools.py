@@ -3,7 +3,9 @@ import os
 import psycopg2
 import json
 from agents import function_tool
-from env import DATABASE_URL
+from core.database import SessionLocal
+from models.settings import DatabaseSettings
+import env
 from rich.console import Console
 from rich.panel import Panel
 
@@ -22,8 +24,25 @@ def run_sql_query(sql: str) -> dict:
     console.print("\n[bold magenta]Executing `run_sql_query` tool...[/bold magenta]")
     console.print(Panel(sql, title="SQL Query", border_style="magenta", expand=False))
     try:
+        # Resolve connection string dynamically
+        db = SessionLocal()
+        try:
+            settings = db.query(DatabaseSettings).first()
+            if settings:
+                if settings.is_manual:
+                    ssl_str = f"?sslmode={settings.ssl_mode}" if settings.ssl_mode else ""
+                    db_url = f"postgresql://{settings.username}:{settings.password}@{settings.host}:{settings.port}/{settings.database_name}{ssl_str}"
+                else:
+                    db_url = settings.connection_string
+            else: 
+                return "No valid database connected please configure from settings"
+        except Exception as db_err:
+            console.print(f"[yellow]Failed to fetch settings from DB, using fallback: {db_err}[/yellow]")
+            return "No valid database connected please configure from settings"
+        finally:
+            db.close()
         # connect to database
-        connection = psycopg2.connect(DATABASE_URL)
+        connection = psycopg2.connect(db_url)
 
         cursor = connection.cursor()
 
