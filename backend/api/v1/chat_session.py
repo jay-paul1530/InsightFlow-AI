@@ -65,3 +65,30 @@ def get_session_messages(
             for chat in chats
         ]
     }
+
+
+# Delete a chat session
+@router.delete("/sessions/{session_id}")
+def delete_chat_session(session_id: str, db: Session = Depends(get_db)):
+    session = db.query(ChatSession).filter(ChatSession.session_id == session_id).first()
+    if not session:
+        raise HTTPException(
+            status_code=404,
+            detail="Session not found"
+        )
+    
+    # Delete related chat messages
+    db.query(Chat).filter(Chat.session_id == session_id).delete()
+    # Delete session
+    db.delete(session)
+    db.commit()
+
+    # Try deleting weaviate collection
+    try:
+        import services.ecommerce_agent.weaviate_util as weaviate_util
+        collection_name_chat_history = f"chat_history_{session_id.replace('-', '')}"
+        weaviate_util.delete_object(collection_name_chat_history)
+    except Exception as e:
+        print(f"Failed to delete Weaviate collection for session {session_id}: {e}")
+
+    return {"status": "success", "message": f"Session {session_id} deleted successfully."}

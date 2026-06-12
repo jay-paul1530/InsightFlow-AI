@@ -13,7 +13,8 @@ import {
   Terminal, 
   Table,
   User,
-  AlertCircle
+  AlertCircle,
+  Trash2
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -105,6 +106,27 @@ export default function Home() {
     setTimeout(() => {
       textareaRef.current?.focus();
     }, 100);
+  };
+
+  const handleDeleteSession = async (e: React.MouseEvent, sessionId: string) => {
+    e.stopPropagation();
+    if (!confirm("Are you sure you want to delete this chat session?")) return;
+    
+    try {
+      const res = await fetch(`/api/v1/sessions/${sessionId}`, {
+        method: "DELETE"
+      });
+      if (!res.ok) throw new Error("Failed to delete session");
+      
+      if (activeSessionId === sessionId) {
+        setActiveSessionId(null);
+        setMessages([]);
+      }
+      fetchSessions();
+    } catch (err: any) {
+      console.error(err);
+      alert("Failed to delete the session. Please try again.");
+    }
   };
 
   const handleSend = async (e?: React.FormEvent) => {
@@ -287,14 +309,23 @@ export default function Home() {
             </div>
           ) : (
             sessions.map((session) => (
-              <button
+              <div
                 key={session.session_id}
                 className={`session-item ${activeSessionId === session.session_id ? "active" : ""}`}
                 onClick={() => loadSessionMessages(session.session_id)}
               >
-                <span className="session-title">{session.title || "Untitled Chat"}</span>
-                <span className="session-date">{formatDate(session.updated_at || session.created_at)}</span>
-              </button>
+                <div className="session-info-left">
+                  <span className="session-title">{session.title || "Untitled Chat"}</span>
+                  <span className="session-date">{formatDate(session.updated_at || session.created_at)}</span>
+                </div>
+                <button
+                  className="delete-session-btn"
+                  onClick={(e) => handleDeleteSession(e, session.session_id)}
+                  title="Delete Session"
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
             ))
           )}
         </div>
