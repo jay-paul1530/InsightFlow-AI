@@ -3,9 +3,11 @@ from api.v1.healthcheck import router as healthcheck_router
 from api.v1.dummy import router as dummy_router
 from api.v1.chat import router as chat_router
 from api.v1.chat_session import router as chat_session_router
+from api.v1.settings import router as settings_router
 from core.database import Base, engine
 import models.chat
 import models.chat_session
+import models.settings
 
 Base.metadata.create_all(bind=engine)
 
@@ -17,6 +19,11 @@ app.include_router(
     chat_session_router,
     prefix="/api/v1",
     tags=["Chat Sessions"]
+)
+app.include_router(
+    settings_router,
+    prefix="/api/v1",
+    tags=["Settings"]
 )
 
 if __name__ == "__main__":

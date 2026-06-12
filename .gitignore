@@ -229,3 +229,5 @@ temp_data/*
 *.csv.gz
 *.pyc
 *.pyc/*
+./frontend
+/frontend
