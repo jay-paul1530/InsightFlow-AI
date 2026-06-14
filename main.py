@@ -13,7 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # Base.metadata.create_all(bind=engine) # Removed for serverless environment to prevent cold start DB hits
 
-app = FastAPI()
+app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 
 app.add_middleware(
     CORSMiddleware,
