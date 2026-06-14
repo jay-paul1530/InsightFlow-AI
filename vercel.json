@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pip install -r requirements.txt && alembic upgrade head",
+  "buildCommand": "pip install -r requirements.txt",
   "regions": ["bom1"],
   "builds": [
     {
