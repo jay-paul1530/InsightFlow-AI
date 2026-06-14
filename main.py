@@ -9,9 +9,20 @@ import models.chat
 import models.chat_session
 import models.settings
 
+from fastapi.middleware.cors import CORSMiddleware
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(healthcheck_router, prefix="/api/v1", tags=["Healthcheck"])
 app.include_router(dummy_router, prefix="/api/v1", tags=["Dummy"])
 app.include_router(chat_router, prefix="/api/v1", tags=["Chat"])
