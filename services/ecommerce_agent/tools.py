@@ -57,27 +57,27 @@ def run_sql_query(sql: str) -> dict:
         # Convert non-serializable objects (like Decimal, date, datetime) to string
         data = json.loads(json.dumps(data, default=str))
 
-        # Save to a local file for the agent to upload to sandbox if needed
-        if not os.path.exists("temp_data"):
-            os.mkdir("temp_data")
+        # # Save to a local file for the agent to upload to sandbox if needed
+        # if not os.path.exists("temp_data"):
+        #     os.mkdir("temp_data")
         
-        file_name = f"query_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-        file_path = os.path.join("temp_data", file_name)
+        # file_name = f"query_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        # file_path = os.path.join("temp_data", file_name)
 
-        with open(file_path, 'w') as f:
-            json.dump(data, f)
+        # with open(file_path, 'w') as f:
+        #     json.dump(data, f)
 
         connection.commit()
         cursor.close()
         connection.close()
 
-        console.print(f"[bold green]Data fetched successfully. Saved to {file_path}[/bold green]")
+        console.print(f"[bold green]Data fetched successfully[/bold green]")
         return {
                 "status": "success",
                 "message": f"Query returned {len(data)} rows. Data has been saved to the file path below. Please use the upload_file_to_sandbox tool to upload this file to the sandbox for further processing.",
                 "row_count": len(data),
                 "sample_data": data[:5],
-                "saved_file_path": file_path
+                # "saved_file_path": file_path
             }
     except Exception as e:
         console.print("\n[bold red]ERROR OCCURRED IN SQL QUERY EXECUTION[/bold red]")
@@ -87,5 +87,5 @@ def run_sql_query(sql: str) -> dict:
                 "message": f"\n ERROR OCCURED IN SQL QUERY EXECUTION \n Error: {e}\n",
                 "row_count": 0,
                 "sample_data": [],
-                "saved_file_path": ""
+                # "saved_file_path": ""
             }
