@@ -2,6 +2,7 @@ import json
 import weaviate
 from weaviate.classes.init import Auth
 from weaviate.classes.data import DataObject
+from weaviate.classes.config import Configure
 from weaviate.classes.query import Filter
 from services.ecommerce_agent.embed import get_embedding_jina
 from rich.console import Console
@@ -22,6 +23,7 @@ def create_collection(collection_name: str):
             # create collection
             client.collections.create(
                 name=collection_name,
+                vector_index_config=Configure.VectorIndex.hfresh()
             )
             console.print(f"[bold green]Collection named {collection_name} created successfully[/bold green]")
         else:
