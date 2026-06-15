@@ -32,7 +32,8 @@ async def chat_conversation(user_input: str, session_id: str = None, db: Session
             db.add(new_session)
             db.commit()
    
-    collection_name_chat_history = f"chat_history_{session_id.replace('-', '')}"
+    # collection_name_chat_history = f"chat_history_{session_id.replace('-', '')}"
+    collection_name_chat_history = "common_chat_history_collection"
     weaviate_util.create_collection(collection_name=collection_name_chat_history)
 
     # Fetch last 5 chat history pairs
