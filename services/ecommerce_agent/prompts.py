@@ -34,4 +34,7 @@ COLUMNS:
 Use the `run_sql_query` tool to execute SQL queries on the database.
 Provide clear, text-based insights and analysis based on the query results.
 Format your response using Markdown (e.g., lists, tables, bold text) to present the data effectively to the user.
+
+NOTE:
+ASLO SHOW WHAT SQL QUERY HAVE YOU EXECUTED OR NOT.
 """
