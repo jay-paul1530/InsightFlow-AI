@@ -20,8 +20,13 @@ DB_NAME = os.getenv("DB_Name")
 DB_USER = os.getenv("DB_User")
 DB_PASSWORD = os.getenv("DB_Password")
 
-DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOSTNAME}:{DB_PORT}/{DB_NAME}" if (os.getenv("DATABASE_URL") == "" or os.getenv("DATABASE_URL") is None) else os.getenv("DATABASE_URL")
-
+_env_db_url = os.getenv("DATABASE_URL")
+if _env_db_url:
+    DATABASE_URL = _env_db_url
+elif all([DB_USER, DB_PASSWORD, DB_HOSTNAME, DB_PORT, DB_NAME]):
+    DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOSTNAME}:{DB_PORT}/{DB_NAME}"
+else:
+    DATABASE_URL = "sqlite:///./sql_assistant.db"
 
 EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME")
 JINA_API_KEY = os.getenv("JINA_API_KEY")

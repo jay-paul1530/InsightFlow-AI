@@ -11,7 +11,7 @@ import models.settings
 
 from fastapi.middleware.cors import CORSMiddleware
 
-# Base.metadata.create_all(bind=engine) # Removed for serverless environment to prevent cold start DB hits
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 

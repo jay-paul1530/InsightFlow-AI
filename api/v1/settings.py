@@ -9,8 +9,9 @@ import psycopg2
 router = APIRouter()
 
 class SettingsSchema(BaseModel):
-    is_manual: bool
+    is_manual: Optional[bool] = False
     connection_string: Optional[str] = None
+    database_url: Optional[str] = None  # Frontend sends this
     host: Optional[str] = None
     port: Optional[int] = None
     database_name: Optional[str] = None
@@ -25,6 +26,7 @@ def get_settings(db: Session = Depends(get_db)):
         return {
             "is_manual": False,
             "connection_string": "",
+            "database_url": "",
             "host": "",
             "port": 5432,
             "database_name": "",
@@ -35,6 +37,7 @@ def get_settings(db: Session = Depends(get_db)):
     return {
         "is_manual": settings.is_manual,
         "connection_string": settings.connection_string or "",
+        "database_url": settings.connection_string or "",
         "host": settings.host or "",
         "port": settings.port or 5432,
         "database_name": settings.database_name or "",
@@ -51,7 +54,8 @@ def save_settings(data: SettingsSchema, db: Session = Depends(get_db)):
         db.add(settings)
     
     settings.is_manual = data.is_manual
-    settings.connection_string = data.connection_string
+    # Use database_url if connection_string is not provided
+    settings.connection_string = data.connection_string or data.database_url
     settings.host = data.host
     settings.port = data.port
     settings.database_name = data.database_name
@@ -70,9 +74,9 @@ def test_settings_connection(data: SettingsSchema):
         ssl_str = f"?sslmode={data.ssl_mode}" if data.ssl_mode else ""
         db_url = f"postgresql://{data.username}:{data.password}@{data.host}:{data.port}/{data.database_name}{ssl_str}"
     else:
-        if not data.connection_string:
-            raise HTTPException(status_code=400, detail="Connection string is empty.")
-        db_url = data.connection_string
+        db_url = data.connection_string or data.database_url
+        if not db_url:
+            raise HTTPException(status_code=400, detail="Connection string/database URL is empty.")
         
     try:
         conn = psycopg2.connect(db_url, connect_timeout=5)
