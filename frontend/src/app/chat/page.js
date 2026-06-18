@@ -15,7 +15,8 @@ import {
   CreditCard,
   ShoppingBag,
   Trash2,
-  Settings
+  Settings,
+  LogOut
 } from 'lucide-react';
 import MarkdownRenderer from '../../components/MarkdownRenderer';
 
@@ -63,10 +64,21 @@ export default function ChatPage() {
     }
   ];
 
-  // Fetch all sessions on mount
+  // Authenticate route guard and fetch sessions
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login';
+      return;
+    }
     fetchSessions();
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user_email');
+    window.location.href = '/login';
+  };
 
   // Scroll to bottom when messages or loading state changes
   useEffect(() => {
@@ -91,8 +103,14 @@ export default function ChatPage() {
   };
 
   const fetchSessions = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
     try {
-      const res = await fetch(`${API_URL}/api/v1/sessions`);
+      const res = await fetch(`${API_URL}/api/v1/sessions`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       if (!res.ok) throw new Error('Failed to fetch sessions');
       const data = await res.json();
       setSessions(data);
@@ -110,10 +128,17 @@ export default function ChatPage() {
       return;
     }
 
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_URL}/api/v1/sessions/${sessionId}/messages`);
+      const res = await fetch(`${API_URL}/api/v1/sessions/${sessionId}/messages`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       if (!res.ok) throw new Error('Failed to load messages');
       const data = await res.json();
       setCurrentSessionId(sessionId);
@@ -130,6 +155,9 @@ export default function ChatPage() {
   const handleSendMessage = async (textToSend) => {
     const query = (textToSend || inputValue).trim();
     if (!query || loading) return;
+
+    const token = localStorage.getItem('token');
+    if (!token) return;
 
     setError(null);
     setLoading(true);
@@ -150,7 +178,11 @@ export default function ChatPage() {
         url += `&session_id=${currentSessionId}`;
       }
 
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       if (!res.ok) throw new Error('API server returned an error');
       const data = await res.json();
 
@@ -193,9 +225,14 @@ export default function ChatPage() {
     if (!confirm('Are you sure you want to permanently delete this session?')) {
       return;
     }
+    const token = localStorage.getItem('token');
+    if (!token) return;
     try {
       const res = await fetch(`${API_URL}/api/v1/sessions/${sessionId}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
       if (!res.ok) throw new Error('Failed to delete session');
       if (currentSessionId === sessionId) {
@@ -311,14 +348,26 @@ export default function ChatPage() {
         </div>
 
         <div className="sidebar-footer">
-          <button 
-            className="sidebar-settings-btn"
-            onClick={() => window.location.href = '/settings'}
-            title="Settings"
-          >
-            <Settings size={14} />
-            <span>Settings</span>
-          </button>
+          <div style={{ display: 'flex', gap: '8px', width: '100%', marginBottom: '12px' }}>
+            <button 
+              className="sidebar-settings-btn"
+              onClick={() => window.location.href = '/settings'}
+              title="Settings"
+              style={{ flex: 1 }}
+            >
+              <Settings size={14} />
+              <span>Settings</span>
+            </button>
+            <button 
+              className="sidebar-settings-btn"
+              onClick={handleLogout}
+              title="Log Out"
+              style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.15)', color: 'var(--danger)' }}
+            >
+              <LogOut size={14} />
+              <span>Log Out</span>
+            </button>
+          </div>
           <div className="user-profile">
             <div className="avatar">JP</div>
             <div className="user-info">

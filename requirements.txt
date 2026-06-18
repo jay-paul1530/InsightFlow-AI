@@ -10,6 +10,8 @@ litellm==1.84.0
 weaviate-client==4.21.0
 psycopg2-binary==2.9.12
 rich<15.0.0
-fastapi==0.136.3
-uvicorn==0.48.0
-sqlalchemy==2.0.50
+FastAPI==0.136.3
+Uvicorn==0.48.0
+SQLAlchemy==2.0.50
+PyJWT==2.8.0
+

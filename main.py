@@ -1,9 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from api.v1.healthcheck import router as healthcheck_router
 from api.v1.dummy import router as dummy_router
 from api.v1.chat import router as chat_router
 from api.v1.chat_session import router as chat_session_router
 from api.v1.settings import router as settings_router
+from api.v1.auth import router as auth_router, get_current_user
 from core.database import Base, engine
 import models.chat
 import models.chat_session
@@ -23,19 +24,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth_router, prefix="/api/v1", tags=["Auth"])
 app.include_router(healthcheck_router, prefix="/api/v1", tags=["Healthcheck"])
-app.include_router(dummy_router, prefix="/api/v1", tags=["Dummy"])
-app.include_router(chat_router, prefix="/api/v1", tags=["Chat"])
+app.include_router(dummy_router, prefix="/api/v1", tags=["Dummy"], dependencies=[Depends(get_current_user)])
+app.include_router(chat_router, prefix="/api/v1", tags=["Chat"], dependencies=[Depends(get_current_user)])
 app.include_router(
     chat_session_router,
     prefix="/api/v1",
-    tags=["Chat Sessions"]
+    tags=["Chat Sessions"],
+    dependencies=[Depends(get_current_user)]
 )
 app.include_router(
     settings_router,
     prefix="/api/v1",
-    tags=["Settings"]
+    tags=["Settings"],
+    dependencies=[Depends(get_current_user)]
 )
+
 
 if __name__ == "__main__":
     import uvicorn

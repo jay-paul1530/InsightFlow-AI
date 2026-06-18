@@ -22,12 +22,23 @@ export default function SettingsPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login';
+      return;
+    }
     fetchSettings();
   }, []);
 
   const fetchSettings = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
     try {
-      const res = await fetch(`${API_URL}/api/v1/settings`);
+      const res = await fetch(`${API_URL}/api/v1/settings`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       if (!res.ok) throw new Error('Failed to fetch settings');
       const data = await res.json();
       setIsManual(data.is_manual || false);
@@ -57,6 +68,9 @@ export default function SettingsPage() {
       return;
     }
 
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
     setTestingConnection(true);
     setError(null);
     setMessage(null);
@@ -78,6 +92,7 @@ export default function SettingsPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(payload),
       });
@@ -107,6 +122,9 @@ export default function SettingsPage() {
       return;
     }
 
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
     setLoading(true);
     setError(null);
     setMessage(null);
@@ -128,6 +146,7 @@ export default function SettingsPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(payload),
       });
