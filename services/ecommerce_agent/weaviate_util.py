@@ -11,11 +11,27 @@ from env import WEAVIATE_URL, WEAVIATE_API_KEY
 console = Console()
 
 
+def get_weaviate_client():
+    if not WEAVIATE_URL or "localhost" in WEAVIATE_URL or "127.0.0.1" in WEAVIATE_URL:
+        port = 8080
+        if WEAVIATE_URL:
+            import urllib.parse
+            try:
+                parsed = urllib.parse.urlparse(WEAVIATE_URL)
+                if parsed.port:
+                    port = parsed.port
+            except Exception:
+                pass
+        return weaviate.connect_to_local(port=port)
+    else:
+        return weaviate.connect_to_weaviate_cloud(
+            cluster_url=WEAVIATE_URL,
+            auth_credentials=Auth.api_key(WEAVIATE_API_KEY) if WEAVIATE_API_KEY else None,
+        )
+
+
 def create_collection(collection_name: str):
-    with weaviate.connect_to_weaviate_cloud(
-        cluster_url=WEAVIATE_URL,
-        auth_credentials=Auth.api_key(WEAVIATE_API_KEY),
-    ) as client:
+    with get_weaviate_client() as client:
         exists = client.collections.exists(collection_name)
         if not exists:
             console.print(f"[dim]Collection named {collection_name} does not exist. Creating...[/dim]")
@@ -23,7 +39,7 @@ def create_collection(collection_name: str):
             # create collection
             client.collections.create(
                 name=collection_name,
-                vector_index_config=Configure.VectorIndex.hfresh()
+                vector_index_config=Configure.VectorIndex.hnsw()
             )
             console.print(f"[bold green]Collection named {collection_name} created successfully[/bold green]")
         else:
@@ -31,10 +47,7 @@ def create_collection(collection_name: str):
 
 
 def insert_data(collection_name, data_objects):
-    with weaviate.connect_to_weaviate_cloud(
-        cluster_url=WEAVIATE_URL,
-        auth_credentials=Auth.api_key(WEAVIATE_API_KEY),
-    ) as client:
+    with get_weaviate_client() as client:
         exists = client.collections.exists(collection_name)
 
         if exists:
@@ -54,17 +67,11 @@ def insert_data(collection_name, data_objects):
 
 
 def read_all_objects(collection_name):
-    with weaviate.connect_to_weaviate_cloud(
-        cluster_url=WEAVIATE_URL,
-        auth_credentials=Auth.api_key(WEAVIATE_API_KEY),
-    ) as client:
+    with get_weaviate_client() as client:
         exists = client.collections.exists(collection_name)
 
     if exists:
-        with weaviate.connect_to_weaviate_cloud(
-            cluster_url=WEAVIATE_URL,
-            auth_credentials=Auth.api_key(WEAVIATE_API_KEY),
-        ) as client:
+        with get_weaviate_client() as client:
             coll = client.collections.use(collection_name)  
             data = []
             for item in coll.iterator(include_vector=False):
@@ -75,17 +82,11 @@ def read_all_objects(collection_name):
         return None
 
 def delete_object(collection_name):
-    with weaviate.connect_to_weaviate_cloud(
-        cluster_url=WEAVIATE_URL,
-        auth_credentials=Auth.api_key(WEAVIATE_API_KEY),
-    ) as client:
+    with get_weaviate_client() as client:
         exists = client.collections.exists(collection_name)
 
     if exists:
-        with weaviate.connect_to_weaviate_cloud(
-            cluster_url=WEAVIATE_URL,
-            auth_credentials=Auth.api_key(WEAVIATE_API_KEY),
-        ) as client:
+        with get_weaviate_client() as client:
             client.collections.delete(collection_name)
             console.print(f"[dim]Collection {collection_name} deleted[/dim]")
     else:
@@ -93,10 +94,7 @@ def delete_object(collection_name):
 
 
 def search_data(collection_name, query_text, session_id=None, limit=3):
-    with weaviate.connect_to_weaviate_cloud(
-        cluster_url=WEAVIATE_URL,
-        auth_credentials=Auth.api_key(WEAVIATE_API_KEY),
-    ) as client:
+    with get_weaviate_client() as client:
         if client.collections.exists(collection_name):
             collection = client.collections.use(collection_name)
             try:
