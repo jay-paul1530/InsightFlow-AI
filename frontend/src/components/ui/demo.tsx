@@ -163,10 +163,7 @@ export default function Demo() {
                 variants={itemVariants}
                 className="workflow-card group"
               >
-                {/* Step badge */}
-                <div className="absolute -top-3 -left-3 w-8 h-8 rounded-full bg-primary text-sm font-bold flex items-center justify-center text-primary-foreground shadow-lg border border-white/10 group-hover:scale-110 transition-transform duration-300">
-                  {step.number}
-                </div>
+
 
                 {/* Step Icon */}
                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-primary/5 border border-primary/15 text-primary mb-8 group-hover:bg-primary/10 group-hover:border-primary/25 transition-all duration-300">
