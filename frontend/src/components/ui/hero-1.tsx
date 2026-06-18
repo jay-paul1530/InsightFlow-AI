@@ -128,9 +128,9 @@ export function HeroLanding(props: HeroLandingProps) {
           key={index}
           href={cta.href}
           onClick={handleCtaClick}
-          className="inline-flex items-center justify-center text-sm font-semibold text-foreground hover:text-muted-foreground transition-colors"
+          className="inline-flex items-center justify-center whitespace-nowrap rounded-full bg-white/10 border border-white/10 hover:bg-white/15 hover:border-white/20 px-10 py-4.5 text-lg font-bold text-white shadow-lg hover:scale-[1.03] active:scale-[0.97] transition-all duration-200"
         >
-          {cta.text} <span aria-hidden="true" className="ml-1">→</span>
+          {cta.text}
         </a>
       )
     }
@@ -144,11 +144,11 @@ export function HeroLanding(props: HeroLandingProps) {
           <span className="w-2.5 h-2.5 rounded-full bg-primary" />
           <span>InsightFlow AI</span>
         </div>
-        <div className="flex items-center gap-4">
-          <a href="/chat" className="border border-white/10 hover:border-white/20 px-5 py-2 rounded-full text-sm font-semibold text-white transition-all bg-white/5 hover:bg-white/10">
+        <div className="flex items-center gap-3">
+          <a href="/chat" className="bg-[#0f131a] hover:bg-[#151c27] border border-white/10 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all shadow-md">
             Login
           </a>
-          <a href="/chat" className="bg-white text-black hover:bg-white/90 px-5 py-2 rounded-full text-sm font-semibold transition-all shadow-md hover:scale-[1.02] active:scale-[0.98]">
+          <a href="/chat" className="bg-white text-black hover:bg-white/90 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-md hover:scale-[1.02] active:scale-[0.98]">
             Sign Up
           </a>
         </div>
