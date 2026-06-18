@@ -33,8 +33,7 @@ export default function Demo() {
     // Additional customization
     className: "min-h-screen",
     callToActions: [
-      { text: "Start Building", href: "/chat", variant: "primary" },
-      { text: "Try the Demo", href: "/chat", variant: "secondary" }
+      { text: "Start Building", href: "/chat", variant: "primary" }
     ]
   };
 

@@ -116,10 +116,10 @@ export function HeroLanding(props: HeroLandingProps) {
           key={index}
           href={cta.href}
           onClick={handleCtaClick}
-          className="inline-flex items-center justify-center whitespace-nowrap rounded-full bg-white text-black px-10 py-4.5 text-lg font-bold shadow-xl hover:bg-white/95 hover:scale-[1.03] active:scale-[0.97] transition-all duration-200 gap-2"
+          className="inline-flex items-center justify-center whitespace-nowrap rounded-full bg-white text-black px-16 py-6 text-xl font-extrabold shadow-2xl hover:bg-white/95 hover:scale-[1.05] active:scale-[0.95] transition-all duration-200 gap-3.5"
         >
           <span>{cta.text}</span>
-          <ChevronRight size={22} className="stroke-[2.5]" />
+          <ChevronRight size={24} className="stroke-[3]" />
         </a>
       )
     } else {
@@ -138,17 +138,17 @@ export function HeroLanding(props: HeroLandingProps) {
 
   return (
     <div className={`min-h-screen w-full overflow-x-hidden relative ${className || ''}`}>
-      {/* Header navbar */}
-      <header className="absolute top-0 left-0 right-0 z-30 px-6 py-6 max-w-[1200px] mx-auto flex items-center justify-between">
-        <div className="flex items-center gap-2 font-bold text-lg text-white">
-          <span className="w-2.5 h-2.5 rounded-full bg-primary" />
+      {/* Header navbar - full width and padded to push buttons to corners */}
+      <header className="absolute top-0 left-0 right-0 z-30 px-8 md:px-16 py-8 w-full flex items-center justify-between">
+        <div className="flex items-center gap-3 font-extrabold text-2xl text-white tracking-tight">
+          <span className="w-3.5 h-3.5 rounded-full bg-primary" />
           <span>InsightFlow AI</span>
         </div>
-        <div className="flex items-center gap-3">
-          <a href="/chat" className="bg-[#0f131a] hover:bg-[#151c27] border border-white/10 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all shadow-md">
+        <div className="flex items-center gap-4">
+          <a href="/chat" className="bg-[#0f131a] hover:bg-[#151c27] border border-white/10 px-7 py-3 rounded-xl text-base font-bold text-white transition-all shadow-md hover:scale-[1.02] active:scale-[0.98]">
             Login
           </a>
-          <a href="/chat" className="bg-white text-black hover:bg-white/90 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-md hover:scale-[1.02] active:scale-[0.98]">
+          <a href="/chat" className="bg-white text-black hover:bg-white/90 px-7 py-3 rounded-xl text-base font-bold transition-all shadow-md hover:scale-[1.02] active:scale-[0.98]">
             Sign Up
           </a>
         </div>
@@ -210,7 +210,7 @@ export function HeroLanding(props: HeroLandingProps) {
             
             {/* Call to action buttons with increased spacing */}
             {callToActions && callToActions.length > 0 && (
-              <div className="mt-14 flex items-center justify-center gap-x-6">
+              <div className="mt-20 flex items-center justify-center gap-x-6">
                 {callToActions.map((cta, index) => renderCallToAction(cta, index))}
               </div>
             )}
