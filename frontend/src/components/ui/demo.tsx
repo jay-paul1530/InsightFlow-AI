@@ -127,7 +127,7 @@ export default function Demo() {
       <div className="max-w-[1200px] mx-auto h-[1px] bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="relative py-[100px] overflow-hidden">
+      <section id="how-it-works" className="relative py-[120px] md:py-[160px] overflow-hidden">
         {/* Soft decorative blur */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/2 opacity-[0.02] blur-3xl pointer-events-none -z-10" />
 
@@ -198,7 +198,7 @@ export default function Demo() {
       <div className="max-w-[1200px] mx-auto h-[1px] bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
 
       {/* Feature Showcase Section */}
-      <section className="relative py-[100px] bg-gradient-to-b from-transparent to-[#0a0d16]/30 overflow-hidden">
+      <section className="relative py-[120px] md:py-[160px] bg-gradient-to-b from-transparent to-[#0a0d16]/30 overflow-hidden">
         <div className="hero-glow" />
         <div className="landing-container relative z-10">
 
@@ -251,7 +251,7 @@ export default function Demo() {
       <div className="max-w-[1200px] mx-auto h-[1px] bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
 
       {/* Dedicated CTA Section */}
-      <section className="relative py-[100px] overflow-hidden">
+      <section className="relative py-[120px] md:py-[160px] overflow-hidden">
         <div className="landing-container relative z-10">
           <motion.div
             initial={{ opacity: 0, scale: 0.97, y: 30 }}
