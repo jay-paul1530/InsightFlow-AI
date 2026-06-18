@@ -229,3 +229,8 @@ temp_data/*
 *.csv.gz
 *.pyc
 *.pyc/*
+
+# Keep frontend lib folder
+!frontend/src/lib/
+!frontend/src/lib/**/*
+
