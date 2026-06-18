@@ -200,29 +200,6 @@ export function HeroLanding(props: HeroLandingProps) {
           </div>
         </div>
 
-        {/* Scroll Cue Indicator */}
-        <div
-          onClick={() => {
-            const element = document.getElementById('how-it-works');
-            if (element) {
-              element.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-              });
-            }
-          }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 cursor-pointer text-muted-foreground hover:text-foreground transition-colors group z-20"
-        >
-          <span className="text-xs font-semibold uppercase tracking-wider opacity-60 group-hover:opacity-100 transition-all duration-200">
-            Learn How It Works
-          </span>
-          <motion.div
-            animate={{ y: [0, 6, 0] }}
-            transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-          >
-            <ChevronDown size={18} />
-          </motion.div>
-        </div>
       </div>
     </div>
   )
