@@ -89,3 +89,69 @@ def run_sql_query(sql: str) -> dict:
                 "sample_data": [],
                 # "saved_file_path": ""
             }
+
+
+def get_database_schema() -> str:
+    """
+    Dynamically discover all user tables and columns from the active database connection.
+    """
+    try:
+        db = SessionLocal()
+        try:
+            settings = db.query(DatabaseSettings).first()
+            if settings:
+                if settings.is_manual:
+                    ssl_str = f"?sslmode={settings.ssl_mode}" if settings.ssl_mode else ""
+                    db_url = f"postgresql://{settings.username}:{settings.password}@{settings.host}:{settings.port}/{settings.database_name}{ssl_str}"
+                else:
+                    db_url = settings.connection_string
+            else:
+                db_url = env.DATABASE_URL
+        except Exception:
+            db_url = env.DATABASE_URL
+        finally:
+            db.close()
+
+        if not db_url:
+            return "No database is currently connected."
+
+        # Connect to database
+        connection = psycopg2.connect(db_url)
+        cursor = connection.cursor()
+
+        # Query all user tables and columns in the public schema
+        cursor.execute("""
+            SELECT table_name, column_name, data_type
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+            ORDER BY table_name, ordinal_position;
+        """)
+        rows = cursor.fetchall()
+        cursor.close()
+        connection.close()
+
+        if not rows:
+            return "The database is empty (no tables found in public schema)."
+
+        # Group by table name
+        schema_dict = {}
+        for table_name, column_name, data_type in rows:
+            # Skip framework/settings tables that are not part of user data analysis
+            if table_name in ("database_settings", "settings", "chat", "chat_session", "chats", "sessions"):
+                continue
+            if table_name not in schema_dict:
+                schema_dict[table_name] = []
+            schema_dict[table_name].append(f"- {column_name} ({data_type})")
+
+        if not schema_dict:
+            return "No analytical data tables found in the database."
+
+        # Format schema description
+        schema_desc = []
+        for table, cols in schema_dict.items():
+            schema_desc.append(f"TABLE: {table}\nCOLUMNS:\n" + "\n".join(cols))
+        
+        return "\n\n".join(schema_desc)
+    except Exception as e:
+        return f"Error retrieving database schema: {e}"
+

@@ -36,12 +36,33 @@ def create_collection(collection_name: str):
         if not exists:
             console.print(f"[dim]Collection named {collection_name} does not exist. Creating...[/dim]")
 
-            # create collection
-            client.collections.create(
-                name=collection_name,
-                vector_index_config=Configure.VectorIndex.hnsw()
-            )
-            console.print(f"[bold green]Collection named {collection_name} created successfully[/bold green]")
+            try:
+                # 1. Try standard creation
+                client.collections.create(
+                    name=collection_name
+                )
+                console.print(f"[bold green]Collection named {collection_name} created successfully[/bold green]")
+            except Exception as e:
+                console.print(f"[yellow]Failed to create standard collection: {e}. Retrying with hfresh...[/yellow]")
+                try:
+                    # 2. Try hfresh index for Weaviate Cloud Serverless
+                    client.collections.create(
+                        name=collection_name,
+                        vector_index_config=Configure.VectorIndex.hfresh()
+                    )
+                    console.print(f"[bold green]Collection named {collection_name} created successfully with hfresh[/bold green]")
+                except Exception as e2:
+                    console.print(f"[yellow]Failed to create with hfresh: {e2}. Retrying with no index...[/yellow]")
+                    try:
+                        # 3. Fallback to flat/no vector index
+                        client.collections.create(
+                            name=collection_name,
+                            vector_index_config=Configure.VectorIndex.none()
+                        )
+                        console.print(f"[bold green]Collection named {collection_name} created successfully with no index[/bold green]")
+                    except Exception as e3:
+                        console.print(f"[bold red]All collection creation attempts failed: {e3}[/bold red]")
+                        raise e3
         else:
             console.print(f"[dim]Collection named {collection_name} already exists[/dim]") 
 

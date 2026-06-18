@@ -1,6 +1,6 @@
 from agents import Agent, Runner, set_tracing_disabled
 from services.ecommerce_agent.llm import get_openai_model
-from services.ecommerce_agent.tools import run_sql_query
+from services.ecommerce_agent.tools import run_sql_query, get_database_schema
 from services.ecommerce_agent.prompts import SQL_AGENT_PROMPT
 from services.ecommerce_agent.sandbox_mcp import sandbox_mcp
 from rich.console import Console
@@ -15,9 +15,13 @@ set_tracing_disabled(True)
 
 async def run_ecommerce_agent(user_input: str):
     # sandbox_mcp_obj = await sandbox_mcp()
+    schema_desc = get_database_schema()
     agent = Agent(
         name="EcommerceAgent",
-        instructions=SQL_AGENT_PROMPT.format(current_date=datetime.now().strftime("%Y-%m-%d")),
+        instructions=SQL_AGENT_PROMPT.format(
+            current_date=datetime.now().strftime("%Y-%m-%d"),
+            schema_description=schema_desc
+        ),
         tools=[run_sql_query],
         # mcp_servers=[sandbox_mcp_obj],
         model=get_openai_model()

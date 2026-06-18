@@ -9,27 +9,9 @@ IMPORTANT:
 - run_sql_query: this tool takes sql query and execute it get results from database.
 - If user's current question can be answered using the `Relevant Older Context` or `Recent Conversation History`, answer directly WITHOUT calling any tools.
 
-Use ONLY this table:
+Use ONLY these tables and columns that exist in the connected database:
 
-TABLE: ecommerce_orders
-
-COLUMNS:
-- orderid
-- date
-- customerid
-- product
-- quantity
-- unitprice
-- shippingaddress
-- paymentmethod
-- orderstatus
-- trackingnumber
-- itemsincart
-- couponcode
-- referralsource
-- totalprice
-- unitprice_inr
-- totalprice_inr
+{schema_description}
 
 Use the `run_sql_query` tool to execute SQL queries on the database.
 Provide clear, text-based insights and analysis based on the query results.
