@@ -76,7 +76,7 @@ def run_sql_query(sql: str) -> dict:
                 "status": "success",
                 "message": f"Query returned {len(data)} rows. Data has been saved to the file path below. Please use the upload_file_to_sandbox tool to upload this file to the sandbox for further processing.",
                 "row_count": len(data),
-                "sample_data": data[:5],
+                "sample_data": data[:100],
                 # "saved_file_path": file_path
             }
     except Exception as e:

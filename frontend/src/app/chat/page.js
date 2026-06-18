@@ -234,10 +234,10 @@ export default function ChatPage() {
       {/* Sidebar Panel */}
       <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
         <div className="sidebar-header">
-          <div className="brand">
+          <a href="/" className="brand hover:opacity-80 transition-opacity" style={{ textDecoration: 'none' }}>
             <span className="brand-dot" />
             <span>InsightFlow AI</span>
-          </div>
+          </a>
           <button 
             className="sidebar-toggle-btn"
             onClick={() => setSidebarCollapsed(true)}
