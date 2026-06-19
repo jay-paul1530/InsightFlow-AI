@@ -268,12 +268,38 @@ export default function ChatPage() {
 
   return (
     <div className="app-container">
+      {/* Mobile backdrop overlay to close sidebar on tap */}
+      {!sidebarCollapsed && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={() => setSidebarCollapsed(true)}
+          style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 40 }}
+        />
+      )}
+
       {/* Sidebar Panel */}
       <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
         <div className="sidebar-header">
-          <a href="/" className="brand hover:opacity-80 transition-opacity" style={{ textDecoration: 'none' }}>
-            <span className="brand-dot" />
-            <span>InsightFlow AI</span>
+          <a href="/" className="brand hover:opacity-80 transition-opacity" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="flex items-center justify-center w-6 h-6">
+              <svg className="w-full h-full" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" fill="url(#logo-grad-1)" />
+                <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="url(#logo-grad-2)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <defs>
+                  <linearGradient id="logo-grad-1" x1="2" y1="2" x2="22" y2="12" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#4f46e5" />
+                    <stop offset="1" stopColor="#7c3aed" />
+                  </linearGradient>
+                  <linearGradient id="logo-grad-2" x1="2" y1="12" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#7c3aed" />
+                    <stop offset="1" stopColor="#ec4899" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <span className="text-xl font-bold tracking-tight text-[#9ca3af]">
+              InsightFlow <span className="text-[#3b82f6] font-extrabold">AI</span>
+            </span>
           </a>
           <button 
             className="sidebar-toggle-btn"
@@ -416,10 +442,25 @@ export default function ChatPage() {
 
           {messages.length === 0 ? (
             <div className="welcome-container">
-              <div className="welcome-logo">
-                <Sparkles size={24} />
+              <div className="welcome-logo" style={{ background: 'transparent', boxShadow: 'none', width: '3.5rem', height: '3.5rem' }}>
+                <svg className="w-full h-full" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z" fill="url(#logo-grad-3)" />
+                  <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="url(#logo-grad-4)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <defs>
+                    <linearGradient id="logo-grad-3" x1="2" y1="2" x2="22" y2="12" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#4f46e5" />
+                      <stop offset="1" stopColor="#7c3aed" />
+                    </linearGradient>
+                    <linearGradient id="logo-grad-4" x1="2" y1="12" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#7c3aed" />
+                      <stop offset="1" stopColor="#ec4899" />
+                    </linearGradient>
+                  </defs>
+                </svg>
               </div>
-              <h2 className="welcome-title">InsightFlow AI</h2>
+              <h2 className="welcome-title" style={{ color: '#9ca3af' }}>
+                InsightFlow <span className="text-[#3b82f6] font-extrabold">AI</span>
+              </h2>
               <p className="welcome-desc">
                 AI-powered SQL and database analytics
               </p>

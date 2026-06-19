@@ -382,22 +382,43 @@ button, input, textarea {
 
 @utility workflow-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  gap: 2.5rem;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
   justify-content: center;
   width: 100%;
   max-width: 75rem;
   margin: 0 auto;
 }
 
+@media (min-width: 640px) {
+  .workflow-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .workflow-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2.5rem;
+  }
+}
+
 @utility feature-grid-2x2 {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  gap: 2.5rem;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
   justify-content: center;
   width: 100%;
   max-width: 75rem;
   margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .feature-grid-2x2 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.5rem;
+  }
 }
 
 @utility workflow-card {
@@ -405,8 +426,8 @@ button, input, textarea {
   backdrop-filter: blur(0.75rem);
   border: 1px solid rgba(255, 255, 255, 0.03);
   border-radius: 1.25rem;
-  padding: 2rem;
-  min-height: 13.75rem;
+  padding: 1.25rem;
+  min-height: 12rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -415,19 +436,33 @@ button, input, textarea {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
+@media (min-width: 768px) {
+  .workflow-card {
+    padding: 2rem;
+    min-height: 13.75rem;
+  }
+}
+
 @utility feature-card {
   background-color: rgba(15, 19, 26, 0.2);
   backdrop-filter: blur(0.75rem);
   border: 1px solid rgba(255, 255, 255, 0.03);
   border-radius: 1.25rem;
-  padding: 2rem;
-  min-height: 15rem;
+  padding: 1.25rem;
+  min-height: 12rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+@media (min-width: 768px) {
+  .feature-card {
+    padding: 2rem;
+    min-height: 15rem;
+  }
 }
 
 @utility saas-heading {
